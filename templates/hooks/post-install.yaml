@@ -1,0 +1,24 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "hapi-cms-api.fullname" . }}-post-install-job-hook"
+  labels:
+    {{- include "hapi-cms-api.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: post-install
+        image: 009570627831.dkr.ecr.eu-central-1.amazonaws.com/hapi-cms-api:0.0.1
+        imagePullPolicy: IfNotPresent
+        command: ['date']
+      restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 0
+  backoffLimit: 7
+  completions: 1
+  parallelism: 1

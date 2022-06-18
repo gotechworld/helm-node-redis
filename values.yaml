@@ -1,0 +1,124 @@
+# Default values for guestbook.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 3
+
+image:
+  repository: 009570627831.dkr.ecr.eu-central-1.amazonaws.com/hapi-cms-api
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.0.2"
+containerPort: 3500
+imagePullSecrets:
+  - name: regcred
+nameOverride: ""
+fullnameOverride: ""
+
+
+configMaps:
+  - name: hapi-cms-api-cm
+  
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::009570627831:role/api-token-access-cms
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "hapi-cms-api-sa"
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3500
+
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: 
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 9
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+redis:
+
+  enabled: true
+
+  # Override the redis.fullname template
+
+  fullnameOverride: redis
+
+  auth:
+  ## @param auth.enabled Enable password authentication
+  ##
+    enabled: false
+  ## @param auth.sentinel Enable password authentication on sentinels too
+  ##
+    sentinel: false
+  ## @param auth.password Redis&reg; password
+  ## Defaults to a random 10-character alphanumeric string if not set
+  ##
+    password: ""
+  ## @param auth.existingSecret The name of an existing secret with Redis&reg; credentials
+  ## NOTE: When it's set, the previous `auth.password` parameter is ignored
+  ##
+    existingSecret: ""
+  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
+  ## NOTE: ignored unless `auth.existingSecret` parameter is set
+  ##
+    existingSecretPasswordKey: ""
+  ## @param auth.usePasswordFiles Mount credentials as files instead of using an environment variable
+  ##
+    usePasswordFiles: false
+
+
+  # Disable AOF persistence
+
+  configmap: |-
+
+    appendonly no

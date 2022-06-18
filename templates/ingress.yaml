@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hapi-cms-api-ingress
+  namespace: hapi-cms-api
+spec:
+  rules:
+  - host: ingresshapicmsapi.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hapi-cms-api
+            port:
+              number: 80
+  ingressClassName: nginx

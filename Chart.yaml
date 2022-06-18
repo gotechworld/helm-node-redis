@@ -1,0 +1,15 @@
+apiVersion: v2
+appVersion: "1.0.0"
+description: A Helm chart for Node CMS
+name: hapi-cms-api
+version: 1.0.0
+icon: https://nodejs.org/static/images/logos/nodejs-new-pantone-black.ai
+type: application
+
+
+dependencies:
+  - name: redis
+    version: 15.x.x
+    repository: https://charts.bitnami.com/bitnami
+    alias: redis
+    condition: redis.enabled
